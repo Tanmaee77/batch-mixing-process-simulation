@@ -1,0 +1,48 @@
+VAR_GLOBAL
+    // ==========================================
+    // PHYSICAL & RAW FIELD I/O (ISA-5.1 MAPPED)
+    // ==========================================
+    i_rRaw_LT101        : INT := 0;      // %IW0: Level Transmitter Raw ADC (0 - 27648)
+    i_rRaw_TT101        : INT := 0;      // %IW1: Temperature Transmitter Raw ADC (0 - 27648)
+    
+    i_xPB_Start         : BOOL := FALSE;  // %IX0.0: Batch Start Pushbutton (NO)
+    i_xPB_Stop          : BOOL := FALSE;  // %IX0.1: Batch Stop Pushbutton (NC)
+    i_xPB_EStop         : BOOL := TRUE;   // %IX0.2: Emergency Stop (NC: TRUE = Healthy, FALSE = Tripped)
+    i_xPB_Reset         : BOOL := FALSE;  // %IX0.3: Alarm / Fault Reset Pushbutton
+    i_xM101_AuxFB       : BOOL := FALSE;  // %IX0.4: Agitator Contactor Auxiliary Run Feedback
+
+    q_xFCV101_Cmd       : BOOL := FALSE;  // %QX0.0: Fill Valve Solenoid (True = Open)
+    q_xFCV102_Cmd       : BOOL := FALSE;  // %QX0.1: Drain Valve Solenoid (True = Open)
+    q_xM101_Run         : BOOL := FALSE;  // %QX0.2: Agitator Motor Contactor Coil
+    q_xHTR101_Cmd       : BOOL := FALSE;  // %QX0.3: Immersion Heater Contactor
+    q_xAlarm_Horn       : BOOL := FALSE;  // %QX0.4: Master Fault Horn/Buzzer
+
+    // ==========================================
+    // SCALED PROCESS VALUES & SENSOR HEALTH
+    // ==========================================
+    rLT101_ScaledPct    : REAL := 0.0;    // 0.0 to 100.0 %
+    rLT101_Current_mA   : REAL := 0.0;    // Diagnostic: 4.0 to 20.0 mA
+    xLT101_WireBreak    : BOOL := FALSE;  // Loop Current < 3.8 mA Fault
+
+    rTT101_ScaledDegC   : REAL := 0.0;    // 0.0 to 120.0 °C
+    rTT101_Current_mA   : REAL := 0.0;    // Diagnostic: 4.0 to 20.0 mA
+    xTT101_WireBreak    : BOOL := FALSE;  // Loop Current < 3.8 mA Fault
+
+    // ==========================================
+    // PROCESS SETPOINTS & SAFETY INTERLOCKS
+    // ==========================================
+    rLevel_SP_Fill      : REAL := 80.0;   // Fill target: 80%
+    rTemp_SP_Heat       : REAL := 65.0;   // Heating target: 65 °C
+    rTemp_Hysteresis    : REAL := 2.0;    // 2 °C deadband
+    tMix_Duration       : TIME := T#30S;  // Mixing/Cooking duration
+
+    xInterlock_DryRun   : BOOL := FALSE;  // TRUE when rLT101_ScaledPct < 20.0%
+    xMasterAlarm        : BOOL := FALSE;  // Latched alarm flag
+
+    // ==========================================
+    // BATCH STATE TRACKER
+    // 0 = IDLE, 10 = FILL, 20 = HEAT_MIX, 30 = DRAIN, 99 = FAULT/ESTOP
+    // ==========================================
+    nBatchState         : INT := 0;
+	xLT101_DryRunTrip: BOOL;
+END_VAR

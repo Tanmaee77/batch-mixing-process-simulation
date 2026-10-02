@@ -1,0 +1,25 @@
+// ==========================================
+// FORCEFUL SIMULATION RAMP
+// ==========================================
+
+// 1. Tank Filling: increment both raw input and scaled percentage directly
+IF GVL_Process.q_xFCV101_Cmd AND (GVL_Process.rLT101_ScaledPct < GVL_Process.rLevel_SP_Fill) THEN
+    GVL_Process.rLT101_ScaledPct := GVL_Process.rLT101_ScaledPct + 0.5;
+    GVL_Process.i_rRaw_LT101     := REAL_TO_INT((GVL_Process.rLT101_ScaledPct / 100.0) * 27648.0);
+END_IF;
+
+// 2. Tank Heating: increment both raw input and scaled degC
+IF GVL_Process.q_xHTR101_Cmd AND (GVL_Process.rTT101_ScaledDegC < GVL_Process.rTemp_SP_Heat) THEN
+    GVL_Process.rTT101_ScaledDegC := GVL_Process.rTT101_ScaledDegC + 0.2;
+    GVL_Process.i_rRaw_TT101      := REAL_TO_INT((GVL_Process.rTT101_ScaledDegC / 120.0) * 27648.0);
+END_IF;
+
+// 3. Tank Draining: decrement both
+IF GVL_Process.q_xFCV102_Cmd AND (GVL_Process.rLT101_ScaledPct > 0.0) THEN
+    GVL_Process.rLT101_ScaledPct := GVL_Process.rLT101_ScaledPct - 0.5;
+    GVL_Process.i_rRaw_LT101     := REAL_TO_INT((GVL_Process.rLT101_ScaledPct / 100.0) * 27648.0);
+END_IF;
+
+// 4. Feedbacks & Healthy States
+GVL_Process.i_xM101_AuxFB := GVL_Process.q_xM101_Run;
+GVL_Process.i_xPB_EStop   := TRUE; // Keep E-Stop healthy
